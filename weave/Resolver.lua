@@ -1,7 +1,18 @@
 -- weave/resolver.lua
 
+local parser = require("weave.parser")
+
+-- TODO: this needs real logic to turn a parsed {name, kind} into a full Recipe:
+--   - kind == "native"  -> require the matching file from weave/recipes/<name>.lua
+--   - kind == "aur"/"nix"/"deb" -> hand off to sources/*.lua (not yet built)
+-- Placeholder for now so the module loads; fill in once sources/*.lua exist.
+local function resolve_package_string(pkg_string)
+  local parsed = parser.parse_package_string(pkg_string)
+  error("resolve_package_string: not yet implemented for kind '" .. parsed.kind .. "'")
+end
+
 local function resolve_all(package_strings)
-  local resolved = {}   -- name -> Recipe, deduped:
+  local resolved = {}   -- name -> Recipe, deduped
   local order = {}      -- final build order (array of names)
   local visiting = {}   -- for cycle detection (name -> true while in-progress)
 
@@ -15,7 +26,7 @@ local function resolve_all(package_strings)
 
     visiting[name] = true
 
-    local recipe = resolve_package_string(name)     -- from the parser
+    local recipe = resolve_package_string(name)
     resolved[name] = recipe
 
     -- Recursively resolve dependencies first
@@ -36,3 +47,7 @@ local function resolve_all(package_strings)
     order = order,          -- dependency-safe build order
   }
 end
+
+local M = {}
+M.resolve_all = resolve_all
+return M
