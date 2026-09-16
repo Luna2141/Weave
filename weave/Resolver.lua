@@ -1,14 +1,39 @@
 -- weave/resolver.lua
 
 local parser = require("weave.parser")
+local schema = require("weave.schema")
 
--- TODO: this needs real logic to turn a parsed {name, kind} into a full Recipe:
---   - kind == "native"  -> require the matching file from weave/recipes/<name>.lua
---   - kind == "aur"/"nix"/"deb" -> hand off to sources/*.lua (not yet built)
--- Placeholder for now so the module loads; fill in once sources/*.lua exist.
+-- Turns a parsed {name, kind} into a full, validated Recipe.
 local function resolve_package_string(pkg_string)
   local parsed = parser.parse_package_string(pkg_string)
-  error("resolve_package_string: not yet implemented for kind '" .. parsed.kind .. "'")
+
+  local recipe
+
+  if parsed.kind == "native" then
+    -- Native recipes live at weave/recipes/<name>.lua, authored from
+    -- the recipes/recipe.lua template.
+    local ok, loaded = pcall(require, "weave.recipes." .. parsed.name)
+    if not ok then
+      error(string.format(
+        "no native recipe found for '%s' (expected weave/recipes/%s.lua): %s",
+        parsed.name, parsed.name, loaded
+      ))
+    end
+    recipe = loaded
+  else
+    -- aur / nix / deb: not yet implemented, needs sources/*.lua
+    error(string.format(
+      "resolve_package_string: source kind '%s' not yet implemented (sources/%s.lua doesn't exist yet)",
+      parsed.kind, parsed.kind
+    ))
+  end
+
+  local valid, err = schema.validate(recipe, parsed.kind)
+  if not valid then
+    error(string.format("recipe '%s' failed validation: %s", parsed.name, err))
+  end
+
+  return recipe
 end
 
 local function resolve_all(package_strings)
@@ -49,5 +74,6 @@ local function resolve_all(package_strings)
 end
 
 local M = {}
+M.resolve_package_string = resolve_package_string
 M.resolve_all = resolve_all
 return M
