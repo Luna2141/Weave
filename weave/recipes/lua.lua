@@ -1,18 +1,20 @@
 return {
-  name = "lua",                                       -- package name
-  version = "5.4.7",                                  -- package version number
+  name = "lua",
+  version = "5.4.7",
   source = {
-    kind = "native",                                  -- package type IE: AUR, Deb, Nix, or native
-    url = "https://www.lua.org/ftp/lua-5.4.7.tar.gz", -- source url
-    checksum = "fc3f3291353bbe6ee6dec85ee61331e8",    -- md5 checksum
+    kind = "native",
+    url = "https://www.lua.org/ftp/lua-5.4.7.tar.gz",
+    checksum = "fc3f3291353bbe6ee6dec85ee61331e8",
     patches = {
-      "lua-5.4.7-shared_library-1.patch",             -- patch if needed
+      "lua-5.4.7-shared_library-1.patch",
     },
   },
-  depends = {}, -- dependencies
+  depends = {},
 
-  acquire = {   -- steps needed to acquire package
+  acquire = {
     steps = {
+      { cmd = "curl -LO https://www.lua.org/ftp/lua-5.4.7.tar.gz" },
+      { cmd = "echo 'fc3f3291353bbe6ee6dec85ee61331e8  lua-5.4.7.tar.gz' | md5sum -c -" },
       { cmd = "file lua-5.4.7.tar.gz" },
       { cmd = "tar -xf lua-5.4.7.tar.gz" },
       { cmd = "cd lua-5.4.7 && patch -Np1 -i ../lua-5.4.7-shared_library-1.patch" },

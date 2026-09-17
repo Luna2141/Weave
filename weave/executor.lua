@@ -77,11 +77,10 @@ local function run_step(step, ctx, opts)
     return
   end
 
-  local resolved_cmd = substitute(step.cmd, ctx)
+  -- Every cmd step runs starting from ctx.workdir, so recipes don't
+  -- each have to know/repeat where the executor happens to be running.
+  local resolved_cmd = "cd " .. ctx.workdir .. " && " .. substitute(step.cmd, ctx)
 
-  -- AUR privilege drop: every cmd step for an aur-sourced recipe
-  -- runs as loom-build instead of root. loom itself is already
-  -- running as root here, so this never prompts for a password.
   if ctx.source_kind == "aur" then
     resolved_cmd = "sudo -u loom-build " .. resolved_cmd
   end
