@@ -2,7 +2,7 @@
 
 Weave is the declarative package resolution and build system for [SilkOS](https://github.com/) — a non-systemd Linux distribution configured entirely in Lua. Weave is what `fabric.lua` (SilkOS's system manifest, akin to `configuration.nix`) actually calls into to turn a list of declared packages into real, built software on disk.
 
-> **Status: early, active development.** Weave is not yet functional end-to-end. Core resolution (`parser` → `schema` → `resolver` → `sources/*`) works for native packages; the execution engine (`executor.lua`) and storage staging (OSTree/`store/` commit) are still being built out. Expect breaking changes. See [Open Questions](#open-questions) below.
+> **Status: early, active development.** Weave is not yet functional end-to-end. Core resolution (`parser` → `schema` → `resolver` → `sources/*`) works for native packages; the execution engine (`executor.lua`) and storage staging (OSTree/`store/` commit) are still being built out. Expect breaking changes.
 
 ## What Weave does
 
