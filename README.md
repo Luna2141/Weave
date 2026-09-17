@@ -110,4 +110,4 @@ A few pieces are intentionally still unresolved — see the project's technical 
 
 ## License
 
-*(Add your chosen license here before making the repo public.)*
+GPLv3
