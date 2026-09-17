@@ -20,11 +20,13 @@ return {
       { cmd = "cd lua-5.4.7 && patch -Np1 -i ../lua-5.4.7-shared_library-1.patch" },
       { cmd = "cd lua-5.4.7 && make linux" },
       {
+        -- INSTALL_TOP now points inside ctx.destdir, not the live /usr --
+        -- this is staged output, not a real system install.
         cmd =
-        "cd lua-5.4.7 && make INSTALL_TOP=/usr INSTALL_DATA='cp -d' INSTALL_MAN=/usr/share/man/man1 TO_LIB='liblua.so liblua.so.5.4 liblua.so.5.4.7' install",
-        confirm = "About to install Lua system-wide to /usr. Continue?",
+        "cd lua-5.4.7 && make INSTALL_TOP=${ctx.destdir}/usr INSTALL_DATA='cp -d' INSTALL_MAN=${ctx.destdir}/usr/share/man/man1 TO_LIB='liblua.so liblua.so.5.4 liblua.so.5.4.7' install",
+        confirm = "About to build and stage Lua into its destdir. Continue?",
       },
-      { cmd = "cd lua-5.4.7 && mkdir -pv /usr/share/doc/lua-5.4.7 && cp -v doc/*.html doc/*.css doc/*.gif doc/*.png /usr/share/doc/lua-5.4.7" },
+      { cmd = "cd lua-5.4.7 && mkdir -pv ${ctx.destdir}/usr/share/doc/lua-5.4.7 && cp -v doc/*.html doc/*.css doc/*.gif doc/*.png ${ctx.destdir}/usr/share/doc/lua-5.4.7" },
       {
         fn = function(ctx)
           local f = io.open(ctx.workdir .. "/lua-5.4.7/lua.pc", "w")
@@ -53,7 +55,7 @@ Cflags: -I${includedir}
           f:close()
         end,
       },
-      { cmd = "cd lua-5.4.7 && install -v -m644 -D lua.pc /usr/lib/pkgconfig/lua.pc" },
+      { cmd = "cd lua-5.4.7 && install -v -m644 -D lua.pc ${ctx.destdir}/usr/lib/pkgconfig/lua.pc" },
     },
   },
 }
