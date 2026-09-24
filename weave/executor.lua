@@ -33,6 +33,13 @@ local function substitute(cmd, ctx)
   end))
 end
 
+-- Creates ctx.srcdir and ctx.destdir if they don't already exist.
+-- Called once per recipe, before any step runs.
+local function make_dirs(ctx)
+  shell.run("mkdir -p " .. ctx.srcdir)
+  shell.run("mkdir -p " .. ctx.destdir)
+end
+
 -- Returns true if stdin is an interactive terminal.
 local function is_interactive()
   return shell.run("test -t 0")
@@ -98,6 +105,7 @@ local function run(recipe, opts)
   opts = opts or {}
   local ctx = build_ctx(recipe, opts)
   ctx.source_kind = recipe.source and recipe.source.kind
+  make_dirs(ctx)
 
   local steps = recipe.acquire and recipe.acquire["steps_" .. ctx.flavor]
   steps = steps or (recipe.acquire and recipe.acquire.steps) or {}
